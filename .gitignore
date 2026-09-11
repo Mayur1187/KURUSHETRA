@@ -9,6 +9,10 @@ backend/__pycache__/
 frontend/dist/
 frontend/build/
 
+# Local Database Files
+*.db
+backend/jalsangam.db
+
 # Environment Variables
 .env
 backend/.env
