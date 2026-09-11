@@ -36,6 +36,19 @@ class SQLiteDatabase:
             );
             """)
 
+            # 1b. users
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id TEXT PRIMARY KEY,
+                email TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                full_name TEXT NOT NULL,
+                role TEXT CHECK (role IN ('farmer', 'authority', 'mediator')) DEFAULT 'farmer',
+                village TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+
             # 2. farmers
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS farmers (
@@ -477,14 +490,50 @@ class SQLiteDatabase:
             row = cursor.execute("SELECT * FROM crop_evidence WHERE id = ?", (evidence_id,)).fetchone()
             return dict(row) if row else None
 
+    # User Auth Helpers
+    def add_user(self, user_data):
+        uid = user_data.get("id", f"user-{os.urandom(3).hex()}")
+        now_str = datetime.now().isoformat()
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT INTO users (id, email, password_hash, full_name, role, village, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                uid,
+                user_data["email"].lower().strip(),
+                user_data["password_hash"],
+                user_data["full_name"],
+                user_data.get("role", "farmer"),
+                user_data.get("village", "Ramgarh"),
+                now_str
+            ))
+            conn.commit()
+            return self.get_user_by_id(uid)
+
+    def get_user_by_email(self, email):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE email = ?", (email.lower().strip(),))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
+    def get_user_by_id(self, user_id):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
     def reset_demo_data(self):
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            tables = ["profiles", "farmers", "water_resources", "water_requests", "negotiation_preferences", "fairness_history", "conflicts", "negotiations", "proposals", "objections", "agreements", "audit_logs", "crop_evidence"]
+            tables = ["profiles", "users", "farmers", "water_resources", "water_requests", "negotiation_preferences", "fairness_history", "conflicts", "negotiations", "proposals", "objections", "agreements", "audit_logs", "crop_evidence"]
             for t in tables:
                 cursor.execute(f"DELETE FROM {t}")
             conn.commit()
         self.seed_demo_data()
 
 db_sqlite = SQLiteDatabase()
+
 

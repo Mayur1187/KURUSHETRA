@@ -81,5 +81,25 @@ export const api = {
   challengeCropEvidence: async (data) => {
     const res = await axios.post(`${API_BASE}/crop-evidence/challenge`, data);
     return res.data;
+  },
+
+  // Authentication
+  login: async (email, password) => {
+    const res = await axios.post(`${API_BASE}/auth/login`, { email, password });
+    return res.data;
+  },
+  register: async (data) => {
+    const res = await axios.post(`${API_BASE}/auth/register`, data);
+    return res.data;
+  },
+  quickLogin: async (preset) => {
+    const res = await axios.post(`${API_BASE}/auth/quick-login`, { preset });
+    return res.data;
+  },
+  getMe: async (token) => {
+    const res = await axios.get(`${API_BASE}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return res.data;
   }
 };

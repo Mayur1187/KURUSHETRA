@@ -14,6 +14,7 @@ from routes.mediation import mediation_bp
 from routes.negotiations import negotiations_bp
 from routes.agreements import agreements_bp
 from routes.crop_evidence import crop_evidence_bp
+from routes.auth import auth_bp
 from database.sqlite_db import db_sqlite
 
 def create_app():
@@ -31,6 +32,7 @@ def create_app():
     app.register_blueprint(negotiations_bp)
     app.register_blueprint(agreements_bp)
     app.register_blueprint(crop_evidence_bp)
+    app.register_blueprint(auth_bp)
 
     @app.route("/", methods=["GET"])
     @app.route("/api/health", methods=["GET"])
