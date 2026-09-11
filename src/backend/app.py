@@ -28,11 +28,14 @@ def create_app():
     @app.route("/", methods=["GET"])
     @app.route("/api/health", methods=["GET"])
     def health_check():
+        from database.supabase_client import is_supabase_connected, Config
         return jsonify({
             "status": "healthy",
             "service": "JalSangam AI Backend",
             "version": "1.0.0",
-            "engine": "Deterministic Constraint & AI Mediation Platform"
+            "supabase_connected": is_supabase_connected,
+            "database_mode": "Supabase PostgreSQL" if is_supabase_connected else "In-Memory MockDatabase",
+            "supabase_url": Config.SUPABASE_URL if Config.SUPABASE_URL else "Not Configured"
         }), 200
 
     @app.errorhandler(404)
