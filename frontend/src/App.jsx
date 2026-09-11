@@ -16,6 +16,7 @@ import { ConflictCenter } from './pages/ConflictCenter';
 import { NegotiationRoom } from './pages/NegotiationRoom';
 import { Agreement } from './pages/Agreement';
 import { AgriEvidence } from './pages/AgriEvidence';
+import { VRCommandCenter } from './pages/VRCommandCenter';
 
 export function App() {
   return (
@@ -39,6 +40,14 @@ export function App() {
                     element={
                       <ProtectedRoute>
                         <Dashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/vr-command-center"
+                    element={
+                      <ProtectedRoute>
+                        <VRCommandCenter />
                       </ProtectedRoute>
                     }
                   />

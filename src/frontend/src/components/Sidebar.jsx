@@ -9,7 +9,8 @@ import {
   Bot, 
   FileCheck,
   Home,
-  Sprout
+  Sprout,
+  Box
 } from 'lucide-react';
 
 export const Sidebar = () => {
@@ -23,6 +24,7 @@ export const Sidebar = () => {
   const navItems = [
     { to: '/', label: 'Overview', icon: Home },
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/vr-command-center', label: '3D VR Command', icon: Box, badge: '3D VR' },
     { to: '/agri-evidence', label: 'AgriEvidence', icon: Sprout, badge: 'AI Vision' },
     { to: '/farmers', label: 'Farmers', icon: Users },
     { to: '/water-management', label: 'Water Resource', icon: Droplets },
