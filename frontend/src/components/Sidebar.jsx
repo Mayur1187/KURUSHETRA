@@ -1,5 +1,6 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { 
   LayoutDashboard, 
   Users, 
@@ -12,6 +13,13 @@ import {
 } from 'lucide-react';
 
 export const Sidebar = () => {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+
+  if (!isAuthenticated || location.pathname === '/login' || location.pathname === '/register') {
+    return null;
+  }
+
   const navItems = [
     { to: '/', label: 'Overview', icon: Home },
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
