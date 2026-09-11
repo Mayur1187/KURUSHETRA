@@ -1,8 +1,8 @@
-# JalSangam AI — Autonomous Water-Sharing Dispute Mediation Platform
+# KURUSHETRA — Autonomous Water-Sharing Dispute Mediation Platform
 
-**JalSangam AI** is a full-stack digital mediator platform designed to resolve water allocation disputes among farmers sharing limited irrigation and canal water resources.
+**KURUSHETRA** is a full-stack digital mediator platform designed to resolve water allocation disputes among farmers sharing limited irrigation and canal water resources.
 
-Rather than acting as a simple allocation calculator, JalSangam AI serves as a **neutral autonomous digital mediator** (`JalNyay AI`). It detects water shortages and scheduling overlaps, evaluates farmer urgency and historical fairness, represents farmer preferences via digital negotiation agents, processes natural-language objections, dynamically injects machine-enforceable constraints, recalculates revised allocation schedules, provides factual plain-English explanations, and records binding immutable agreements.
+Rather than acting as a simple allocation calculator, KURUSHETRA serves as a **neutral autonomous digital mediator** (`JalNyay AI`). It detects water shortages and scheduling overlaps, evaluates farmer urgency and historical fairness, represents farmer preferences via digital negotiation agents, processes natural-language objections, dynamically injects machine-enforceable constraints, recalculates revised allocation schedules, provides factual plain-English explanations, and records binding immutable agreements.
 
 ---
 
