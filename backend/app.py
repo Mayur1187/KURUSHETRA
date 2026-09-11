@@ -9,6 +9,8 @@ from routes.conflicts import conflicts_bp
 from routes.mediation import mediation_bp
 from routes.negotiations import negotiations_bp
 from routes.agreements import agreements_bp
+from routes.crop_evidence import crop_evidence_bp
+from database.sqlite_db import db_sqlite
 
 def create_app():
     app = Flask(__name__)
@@ -24,18 +26,17 @@ def create_app():
     app.register_blueprint(mediation_bp)
     app.register_blueprint(negotiations_bp)
     app.register_blueprint(agreements_bp)
+    app.register_blueprint(crop_evidence_bp)
 
     @app.route("/", methods=["GET"])
     @app.route("/api/health", methods=["GET"])
     def health_check():
-        from database.supabase_client import is_supabase_connected, Config
         return jsonify({
             "status": "healthy",
             "service": "JalSangam AI Backend",
             "version": "1.0.0",
-            "supabase_connected": is_supabase_connected,
-            "database_mode": "Supabase PostgreSQL" if is_supabase_connected else "In-Memory MockDatabase",
-            "supabase_url": Config.SUPABASE_URL if Config.SUPABASE_URL else "Not Configured"
+            "database": "Local SQLite (jalsangam.db)",
+            "database_status": "Active & Self-Contained"
         }), 200
 
     @app.errorhandler(404)

@@ -11,6 +11,7 @@ import { WaterManagement } from './pages/WaterManagement';
 import { ConflictCenter } from './pages/ConflictCenter';
 import { NegotiationRoom } from './pages/NegotiationRoom';
 import { Agreement } from './pages/Agreement';
+import { AgriEvidence } from './pages/AgriEvidence';
 
 export function App() {
   return (
@@ -24,6 +25,7 @@ export function App() {
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/agri-evidence" element={<AgriEvidence />} />
                 <Route path="/farmers" element={<Farmers />} />
                 <Route path="/water-management" element={<WaterManagement />} />
                 <Route path="/conflict-center" element={<ConflictCenter />} />

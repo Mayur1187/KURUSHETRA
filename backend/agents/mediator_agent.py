@@ -268,4 +268,79 @@ class MediatorAgent:
             "audit_logs": db.get_audit_logs(negotiation_id)
         }
 
+    def reassess_mediation_with_evidence(self, negotiation_id, farmer_id, evidence_result):
+        logger.info(f"JalNyay AI: Reassessing mediation for {negotiation_id} based on new crop evidence from {farmer_id}...")
+
+        water_resource = db.get_water_resource()
+        water_requests = db.get_water_requests()
+        farmers = db.get_farmers()
+        farmers_dict = {f["id"]: f for f in farmers}
+        pref_dict = {p["farmer_id"]: p for p in db.negotiation_preferences.values()}
+        history = db.get_fairness_history()
+
+        fairness_map = {f["id"]: fairness_engine.calculate_farmer_fairness_metrics(f["id"], history) for f in farmers}
+
+        # Recalculate allocations using evidence-weighted priority scores
+        alloc_result = allocation_engine.generate_allocation(
+            water_resource, water_requests, farmers_dict, fairness_map, db.custom_constraints
+        )
+
+        allocations = alloc_result["allocations"]
+        schedule_slots = scheduler.generate_schedule(
+            allocations, water_requests, float(water_resource.get("canal_capacity", 2500)), db.custom_constraints
+        )
+
+        fairness_score = fairness_engine.compute_system_fairness_score(allocations)
+        explanation = explanation_generator.generate_evidence_explanation(
+            allocations, evidence_result, alloc_result["is_critical_shortage"]
+        )
+
+        revised_proposal_id = f"prop-{negotiation_id}-r-evidence"
+        revised_proposal = {
+            "id": revised_proposal_id,
+            "negotiation_id": negotiation_id,
+            "proposal_round": 2,
+            "allocations": allocations,
+            "schedule": schedule_slots,
+            "total_allocated": alloc_result["total_allocated"],
+            "total_available": alloc_result["total_available"],
+            "fairness_score": fairness_score,
+            "constraint_score": 100.0,
+            "agreement_score": 100.0,
+            "is_critical_shortage": alloc_result["is_critical_shortage"],
+            "constraint_validation": alloc_result["constraint_validation"],
+            "decision_explanation": explanation,
+            "status": "revised_evidence_accepted",
+            "created_at": datetime.now().isoformat()
+        }
+
+        db.proposals[revised_proposal_id] = revised_proposal
+
+        db.add_audit_log(
+            negotiation_id=negotiation_id,
+            event_type="REVISED_PROPOSAL_GENERATED",
+            event_data={"proposal_id": revised_proposal_id, "reason": "Evidence-based priority adjustment", "allocations": allocations}
+        )
+
+        agent_responses = {}
+        for alloc in allocations:
+            fid = alloc["farmer_id"]
+            agent = FarmerAgent(fid, farmers_dict.get(fid, {}), pref_dict.get(fid, {}))
+            eval_res = agent.evaluate_proposal(alloc, db.custom_constraints)
+            agent_responses[fid] = {
+                "farmer_name": alloc["farmer_name"],
+                "decision": eval_res["decision"],
+                "reason": eval_res["reason"]
+            }
+
+        final_agreement = agreement_engine.finalize_agreement(negotiation_id, revised_proposal, agent_responses)
+
+        return {
+            "negotiation_id": negotiation_id,
+            "revised_proposal": revised_proposal,
+            "final_agreement": final_agreement,
+            "audit_logs": db.get_audit_logs(negotiation_id)
+        }
+
 mediator_agent = MediatorAgent()
+

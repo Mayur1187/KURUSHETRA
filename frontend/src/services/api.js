@@ -63,5 +63,23 @@ export const api = {
   getAuditLogs: async (id) => {
     const res = await axios.get(`${API_BASE}/audit-logs/${id}`);
     return res.data;
+  },
+
+  // AgriEvidence Engine
+  analyzeCropEvidence: async (formData) => {
+    const res = await axios.post(`${API_BASE}/crop-evidence/analyze`, formData);
+    return res.data;
+  },
+  getCropEvidenceHistory: async (farmerId) => {
+    const res = await axios.get(`${API_BASE}/crop-evidence/farmer/${farmerId}`);
+    return res.data;
+  },
+  reassessMediationWithEvidence: async (data) => {
+    const res = await axios.post(`${API_BASE}/crop-evidence/reassess`, data);
+    return res.data;
+  },
+  challengeCropEvidence: async (data) => {
+    const res = await axios.post(`${API_BASE}/crop-evidence/challenge`, data);
+    return res.data;
   }
 };

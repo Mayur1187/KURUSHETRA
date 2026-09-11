@@ -1,57 +1,17 @@
 from utils.logger import logger
 from services.constraint_engine import constraint_engine
+from services.priority_engine import priority_engine
+from database.sqlite_db import db_sqlite
 
 class AllocationEngine:
 
-    CROP_CRITICALITY_MAP = {
-        "sugarcane": 0.95,
-        "vegetables": 0.90,
-        "wheat": 0.80,
-        "paddy": 0.85,
-        "cotton": 0.75,
-        "pulses": 0.70
-    }
+    def calculate_priority_score(self, farmer, request, fairness_info, crop_evidence=None):
+        fid = farmer.get("id")
+        if not crop_evidence and fid:
+            crop_evidence = db_sqlite.get_active_crop_evidence(fid)
 
-    STAGE_MULTIPLIER = {
-        "tillering": 1.0,
-        "fruit setting": 1.0,
-        "flowering": 0.95,
-        "germination": 0.90,
-        "vegetative": 0.80,
-        "maturity": 0.60
-    }
-
-    def compute_crop_criticality(self, crop_type, crop_stage):
-        c_score = self.CROP_CRITICALITY_MAP.get(crop_type.lower(), 0.75)
-        s_mult = self.STAGE_MULTIPLIER.get(crop_stage.lower(), 0.85)
-        return min(1.0, c_score * s_mult)
-
-    def calculate_priority_score(self, farmer, request, fairness_info):
-        """
-        Priority Score = Urgency * 0.30 + Crop Criticality * 0.25 +
-                         Historical Disadvantage * 0.20 + Fairness Credit * 0.15 + Water Deficit * 0.10
-        """
-        urgency_norm = float(request.get("urgency", 3)) / 5.0
-
-        crop_type = farmer.get("crop_type", "Wheat")
-        crop_stage = farmer.get("crop_stage", "Flowering")
-        crop_criticality = self.compute_crop_criticality(crop_type, crop_stage)
-
-        historical_disadvantage = float(fairness_info.get("historical_disadvantage", 0.20))
-        fairness_credit_norm = min(1.0, float(fairness_info.get("fairness_credit", 0.0)) / 1000.0)
-
-        req_w = float(request.get("requested_water", 1))
-        min_w = float(request.get("minimum_water", 0))
-        water_deficit = (req_w - min_w) / req_w if req_w > 0 else 0.0
-
-        score = (
-            urgency_norm * 0.30 +
-            crop_criticality * 0.25 +
-            historical_disadvantage * 0.20 +
-            fairness_credit_norm * 0.15 +
-            water_deficit * 0.10
-        )
-        return round(score, 4)
+        res = priority_engine.calculate_priority(farmer, request, fairness_info, crop_evidence)
+        return res["priority_score"]
 
     def generate_allocation(self, water_resource, water_requests, farmers_dict, fairness_history_map=None, custom_constraints=None):
         total_available = float(water_resource.get("total_available_water", 0))

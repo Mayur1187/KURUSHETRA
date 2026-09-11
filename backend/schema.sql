@@ -119,7 +119,25 @@ CREATE TABLE IF NOT EXISTS agreements (
 CREATE TABLE IF NOT EXISTS audit_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     negotiation_id UUID REFERENCES negotiations(id) ON DELETE CASCADE,
-    event_type TEXT NOT NULL, -- CONFLICT_DETECTED, PROPOSAL_GENERATED, FARMER_ACCEPTED, FARMER_REJECTED, OBJECTION_ANALYZED, CONSTRAINT_ADDED, RENEGOTIATION_STARTED, PROPOSAL_REVISED, AGREEMENT_REACHED
+    event_type TEXT NOT NULL,
     event_data JSONB,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- AgriEvidence Engine Table
+CREATE TABLE IF NOT EXISTS crop_evidence (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    farmer_id UUID REFERENCES farmers(id) ON DELETE CASCADE,
+    image_url TEXT,
+    crop_type TEXT,
+    crop_confidence NUMERIC,
+    growth_stage TEXT,
+    growth_confidence NUMERIC,
+    water_stress TEXT,
+    stress_confidence NUMERIC,
+    crop_criticality NUMERIC,
+    evidence_status TEXT DEFAULT 'active', -- active, superseded, challenged
+    analysis_summary TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+

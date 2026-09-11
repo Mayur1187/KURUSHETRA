@@ -7,13 +7,15 @@ import {
   AlertTriangle, 
   Bot, 
   FileCheck,
-  Home
+  Home,
+  Sprout
 } from 'lucide-react';
 
 export const Sidebar = () => {
   const navItems = [
     { to: '/', label: 'Overview', icon: Home },
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/agri-evidence', label: 'AgriEvidence', icon: Sprout, badge: 'AI Vision' },
     { to: '/farmers', label: 'Farmers', icon: Users },
     { to: '/water-management', label: 'Water Resource', icon: Droplets },
     { to: '/conflict-center', label: 'Conflict Center', icon: AlertTriangle },
